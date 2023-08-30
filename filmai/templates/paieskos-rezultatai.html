@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h3>Paieškos frazė: {{ paieskos_tekstas_t }}</h3>
+{% if paieskos_rezultatai_t %}
+    {% for filmas_o in paieskos_rezultatai_t %}
+    <p>
+        <a href="{% url 'filmas-vienas-url' filmas_o.id %}">{{ filmas_o.pavadinimas }}</a>, Aktorius:
+        <a href="{% url 'aktorius-vienas-url' filmas_o.aktoriusFK.id %}"> {{ filmas_o.aktoriusFK.vardas_pavarde }}</a>
+    </p>
+    {% endfor %}
+{% else %}
+    <p>Pagal jūsų paiešką nieko nerasta...</p>
+{% endif %}
+{% endblock %}

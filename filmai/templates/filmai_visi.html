@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>filmu sąrašas:</h1>
+<ul>
+    {% for filmas_o in filmas_list %}
+        <li><a href="{% url 'filmas-vienas-url' filmas_o.id %}">{{ filmas_o.pavadinimas }} - </a>{{ filmas_o.aktoriusFK.vardas_pavarde}}</li>
+
+    {% endfor %}
+
+</ul>
+{% endblock %}

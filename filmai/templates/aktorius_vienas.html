@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h4> {{ aktorius_viena_eilute_t.vardas_pavarde }} - {{ aktorius_viena_eilute_t.g_metai }} </h4>
+<hr/>
+<p><strong>Apie:</strong> {{ aktorius_viena_eilute_t.kinografija }} </p>
+<hr/>
+{% if aktorius_viena_eilute_t.filmas_set.all %}
+<p>Filmai su <strong>{{ aktorius_viena_eilute_t.vardas_pavarde }}</strong>: </p>
+<hr/>
+    {% for filmas_o in aktorius_viena_eilute_t.filmas_set.all %}
+         <li><strong>{{ filmas_o.pavadinimas }}</strong>, Išleidimo data: {{ filmas_o.rodymo_data }}</li>
+          <hr/>
+   {% endfor %}
+{% else %}
+     <p> Filmų su šiuo aktoriu/e nėra</p>
+{% endif %}
+{% endblock %}

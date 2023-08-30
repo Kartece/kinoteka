@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Aktoriai</h1>
+<p>Mūsų aktoriu sąrašas:</p>
+<ul>
+    {% for aktorius_o in aktoriai_visos_eilutes_t %}
+        <li><a href="{% url 'aktorius-vienas-url' aktorius_o.id %}">{{ aktorius_o.vardas_pavarde }}</a></li>
+    {% endfor %}
+</ul>
+<div>
+    {% if aktoriai_visos_eilutes_t.has_other_pages %}
+    <ul class="pagination pagination-sm justify-content-end">
+        {% for nr in aktoriai_visos_eilutes_t.paginator.page_range %}
+            {% if aktoriai_visos_eilutes_t.number == nr %}
+                <li class="page-item active">
+                    <a class="page-link" href="?page={{ nr }}">{{ nr }}</a>
+                </li>
+            {% else %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ nr }}">{{ nr }}</a>
+                </li>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+    </ul>
+</div>
+
+{% endblock %}
