@@ -8,5 +8,9 @@ urlpatterns = [
     path('aktoriai/<int:aktorius_id>', views.aktorius, name='aktorius-vienas-url'),
     path('filmai', views.FilmasListView.as_view(), name='filmai-visi-url'),
     path('filmai/<int:pk>', views.FilmasDetailView.as_view(), name='filmas-vienas-url'),
+    path('register/', views.register, name='register-url'),
+    path('profilis/', views.profilis, name='profilis-url'),
+    path('success/', views.success, name='success-url'),
+    path('rate/<int:id>', views.rate, name='rate-url'),
     path('paieska/', views.search, name='paieska-url'),
     ]

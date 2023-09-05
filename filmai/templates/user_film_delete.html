@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="content-section">
+    <form method="POST">
+        {% csrf_token %}
+        <fieldset class="form-group">
+            <legend class="border-bottom mb-4">Ištrinti knygą</legend>
+            <h2>Ar tikrai norite ištrinti filam is saraso?</h2>
+            <p>{{ object.id }} {{ object.filmas }} {{ object.filmas.aktorius }}</p>
+            <p>{{ object.get_status_display }}</p>
+        </fieldset>
+        <div class="form-group">
+            <button class="btn btn-outline-danger" type="submit">Taip, ištrinti
+            </button>
+            <a class="btn btn-outline-secondary" href="{% url 'my-borrowed' %}">Atšaukti</a>
+        </div>
+    </form>
+</div>
+{% endblock content %}
