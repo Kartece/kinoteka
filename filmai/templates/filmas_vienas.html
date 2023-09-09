@@ -1,6 +1,53 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>{{ filmas.pavadinimas }} - {{ filmas.aktoriusFK.pavadinimas}}</h1>
+<h1>{{ filmas.pavadinimas }}</h1>
+<p class="text-light bg-dark">Aktorius: <a class="text-white" href="{% url 'aktorius-vienas-url' filmas.aktoriusFK.id %}">{{  filmas.aktoriusFK.vardas_pavarde }}</a></p>
+<p><strong>Aprašymas:</strong> {{ filmas.aprasymas | safe }}</p>
+{% if filmas.cover %}
+ <img src="{{ filmas.cover.url }}">
+{% endif %}
+<p><strong>Rodymo data:</strong> {{ filmas.rodymo_data }}</p>
+<p><strong>Kategorija:</strong> {{ filmas.category.all|join:", " }}</p>
+<hr/>
+{% if filmas.filmasinstance_set.all %}
+<h4>Kopijos:</h4>
+    {% for copy in filmas.filmasinstance_set.all %}
+        <p>Bus prieinamas: {{ copy.due_back }}</p>
+        <p>Nr: {{ copy.id }}</p>
+        <p class="{% if copy.status == 'p' %} text-danger
+                  {% elif copy.status == 'g' %} text-success
+                  {% elif copy.status == 'a' %} text-muted
+                  {% else %} text-warning
+                  {% endif %}">
+        <strong>{{ copy.get_status_display }} </strong></p>
 
+    {% endfor %}
+{% else %}
+    <p>Filmo kopiju nėra.</p>
+{% endif %}
+<hr/>
+{% if user.is_authenticated %}
+<div class="fieldWrapper">
+    <h4>Palikite atsiliepimą:</h4>
+    <form action="" method="post">
+        {% csrf_token %}
+        {{ form.content }}
+        <br>
+        <input type="submit" class="btn btn-outline-success btn-sm" value="Išsaugoti">
+    </form>
+</div>
+{% endif %}
+<hr/>
+<h4>Atsiliepimai:</h4>
+{% if filmas.filmasreview_set.all %}
+    {% for review_o in filmas.filmasreview_set.all %}
+        <hr/>
+<img class="img-fluid rounded-circle" src="{{ review_o.reviewer.profilis.nuotrauka.url }}" style="width: 30px; height: 30px;"/>
+<p class="bg-light"><em><strong>{{ review_o.reviewer }}</strong> {{ review_o.review_date }}</em></p>
+        <p>{{ review_o.comment }}</p>
+    {% endfor %}
+{% else %}
+    <p>Atsiliepimu nera. Buk pirmas palikes atsiliepima...</p>
+{% endif %}
 {% endblock %}

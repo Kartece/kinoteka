@@ -3,7 +3,7 @@
 {% block content %}
 <h4> {{ aktorius_viena_eilute_t.vardas_pavarde }} - {{ aktorius_viena_eilute_t.g_metai }} </h4>
 <hr/>
-<p><strong>Apie:</strong> {{ aktorius_viena_eilute_t.kinografija }} </p>
+<p><strong>Apie:</strong> {{ aktorius_viena_eilute_t.kinografija | safe }} </p>
 <hr/>
 {% if aktorius_viena_eilute_t.filmas_set.all %}
 <p>Filmai su <strong>{{ aktorius_viena_eilute_t.vardas_pavarde }}</strong>: </p>
@@ -14,5 +14,28 @@
    {% endfor %}
 {% else %}
      <p> Filmų su šiuo aktoriu/e nėra</p>
+{% endif %}
+{% if user.is_authenticated %}
+<div class="fieldWrapper">
+    <h4>Palikite atsiliepimą:</h4>
+    <form action="" method="post">
+        {% csrf_token %}
+        {{ form.content }}
+        <br>
+        <input type="submit" class="btn btn-outline-success btn-sm" value="Išsaugoti">
+    </form>
+</div>
+{% endif %}
+<hr/>
+<h4>Atsiliepimai:</h4>
+{% if aktorius.aktoriusreview_set.all %}
+    {% for review_o in aktorius.aktoriusreview_set.all %}
+        <hr/>
+<img class="img-fluid rounded-circle" src="{{ review_o.reviewer.profilis.nuotrauka.url }}" style="width: 30px; height: 30px;"/>
+<p class="bg-light"><em><strong>{{ review_o.reviewer }}</strong> {{ review_o.review_date }}</em></p>
+        <p>{{ review_o.comment }}</p>
+    {% endfor %}
+{% else %}
+    <p>Atsiliepimu nera. Buk pirmas palikes atsiliepima...</p>
 {% endif %}
 {% endblock %}

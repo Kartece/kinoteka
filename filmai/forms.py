@@ -1,14 +1,23 @@
-from .models import Filmas, User, Profilis, Review, FilmasInstance
+from .models import User, Profilis, AReview, Review,  FilmasInstance
 from django import forms
 from .models import Review
 
 
 class FilmasReviewForm(forms.ModelForm):
     class Meta:
-        model = Filmas
-        fields = ('pavadinimas', 'aktoriusFK')
+        model = Review
+        fields = ('comment', 'movie', 'reviewer')
         widgets = {  # paslepia laukus
-            'filmas': forms.HiddenInput(),
+            'movie': forms.HiddenInput(),
+            'reviewer': forms.HiddenInput()
+        }
+
+class AktoriusReviewForm(forms.ModelForm):
+    class Meta:
+        model = AReview
+        fields = ('aktorius', 'reviewer')
+        widgets = {  # paslepia laukus
+            'aktorius': forms.HiddenInput(),
             'reviewer': forms.HiddenInput()
         }
 
@@ -38,8 +47,3 @@ class UserFilmasCreateForm(forms.ModelForm):
                    'due_back': DateInput()
                    }
 
-
-class ReviewForm(forms.ModelForm):
-    class Meta:
-        model = Review
-        fields = ["author", "stars", "movie", "comment"]

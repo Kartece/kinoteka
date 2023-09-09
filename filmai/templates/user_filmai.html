@@ -14,13 +14,14 @@
     {% for filmasinst_o in filmasinstance_list %}
 
     <li class="{% if filmasinst_o.is_overdue %}text-danger{% endif %}">
-        <a href="{% url 'filamas-vienas' filmasinst_o.filmas.id %}">
-            {{ filmasinst_o.id }} {{ filmasinst_o.filmas }} {{ filmasinst_o.filmas.aktorius }} </a>
+        <a href="{% url 'filmas-vienas' filmasinst_o.filmas.id %}">
+            {{ filmasinst_o.id }} {{ filmasinst_o.filmas }} {{ filmasinst_o.filmas.aktoriusFK }} </a>
+        {{fimasinst_o.due_back }}
     </li>
     <a class="btn btn-secondary btn-sm" href="{% url 'my-borrowed-update' filmasinst_o.id %}">Redaguoti</a>
         {% for group in user.groups.all %}
             {% if group.name == "Personalas"  %}
-                <a class="btn btn-danger btn-sm" href="{% url 'my-borrowed-delete' filmasinst_o.id %}">Ištrinti</a>
+                <a class="btn btn-danger btn-sm" href="{% url 'my-borrowed-delete' filmasinst_o.id %}">Istrinti</a>
             {% endif %}
         {% endfor %}
     {% endfor %}

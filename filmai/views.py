@@ -7,8 +7,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.models import User
 from django.views.decorators.csrf import csrf_protect
 from django.contrib import messages
+from .forms import AktoriusReviewForm, FilmasReviewForm
 from django.contrib.auth.decorators import login_required
-from .forms import ReviewForm
 
 from .models import Aktorius, Filmas, FilmasInstance, Review
 from .forms import FilmasReviewForm, UserUpdateForm, ProfilisUpdateForm, UserFilmasCreateForm
@@ -27,7 +27,7 @@ def index(request):
 
 
 def aktoriai(request):
-    paginator = Paginator(Aktorius.objects.all(), 6)
+    paginator = Paginator(Aktorius.objects.all(), 8)
     page_number = request.GET.get('page')
     paged_aktoriai = paginator.get_page(page_number)
     context_t = {
@@ -50,10 +50,10 @@ class FilmasListView(generic.ListView):  # ListView - visos eilutės (objektai)
     model = Filmas  # modelioklasė_list -> book_list
     context_object_name = 'filmas_list'
     template_name = 'filmai_visi.html'
-    paginate_by = 3
+    paginate_by = 8
 
 
-class FilmasDetailView(generic.DetailView):
+class FilmasDetailView(generic.edit.FormMixin, generic.DetailView):
     model = Filmas
     context_object_name = 'filmas'
     template_name = 'filmas_vienas.html'
@@ -61,7 +61,7 @@ class FilmasDetailView(generic.DetailView):
 
     # nurodome kur pateksime po submit mygtuko formoj paspaudimo
     def get_success_url(self):
-        return reverse('filmas-one', kwargs={'pk': self.object.id})
+        return reverse('filmas-vienas-url', kwargs={'pk': self.object.id})
 
         # post metodas formai
 
@@ -97,14 +97,14 @@ def search(request):
 
 
 # Mano filmo viewsas
-class LoanedFilmasByUserListView(LoginRequiredMixin, generic.ListView):
+class LoanedFilmaiByUserListView(LoginRequiredMixin, generic.ListView):
     model = FilmasInstance
     template_name = 'user_filmai.html'
     context_object_name = 'filmasinstance_list'
 
 
-#    def get_queryset(self):
-#        return FilmasInstance.objects.filter(reader=self.request.user).order_by('due_back')
+    def get_queryset(self):
+       return FilmasInstance.objects.filter(reader=self.request.user).order_by('due_back')
 
 
 @csrf_protect
@@ -158,9 +158,9 @@ def profilis(request):
     return render(request, 'profilis.html', context=context_t)
 
 
-class FilmasByUserCreateView(LoginRequiredMixin, generic.CreateView):
+class FilmasByUserCreateView(LoginRequiredMixin, UserPassesTestMixin, generic.CreateView):
     model = FilmasInstance
-    # fields = ['book', 'due_back']
+    fields = ['filmas', 'due_back']
     success_url = '/filmai/mymovies'
     template_name = 'user_film_form.html'
     form_class = UserFilmasCreateForm
@@ -169,11 +169,14 @@ class FilmasByUserCreateView(LoginRequiredMixin, generic.CreateView):
         form.instance.reader = self.request.user
         return super().form_valid(form)
 
+    def test_func(self):
+        return self.request.user.groups.filter(name='Personalas').exists()
+
 
 class FilmasByUserUpdateView(LoginRequiredMixin, UserPassesTestMixin,
                              generic.UpdateView):
     model = FilmasInstance
-    fields = ['filmas']
+    fields = ['filmas', 'due_back']
     success_url = '/filmai/mymovies'
     template_name = 'user_film_form.html'
 
@@ -189,7 +192,7 @@ class FilmasByUserUpdateView(LoginRequiredMixin, UserPassesTestMixin,
 class FilmasByUserDeleteView(LoginRequiredMixin, UserPassesTestMixin,
                              generic.DeleteView):
     model = FilmasInstance
-    template_name = 'user_filma_delete.html'
+    template_name = 'user_film_delete.html'
     success_url = '/filmai/mymovies'
 
     def test_func(self):
@@ -199,7 +202,7 @@ class FilmasByUserDeleteView(LoginRequiredMixin, UserPassesTestMixin,
 
 def rate(request, id):
     post = Filmas.objects.get(id=id)
-    form = ReviewForm(request.POST or None)
+    form = FilmasReviewForm(request.POST or None)
     if form.is_valid():
         author = request.POST.get('author')
         stars = request.POST.get('stars')
@@ -208,7 +211,7 @@ def rate(request, id):
         review.save()
         return redirect('success')
 
-    form = ReviewForm()
+    form = FilmasReviewForm()
     context = {
         "form": form
 
@@ -217,3 +220,22 @@ def rate(request, id):
 
 def success(request):
     return render(request, "success.html")
+
+def akthoriusrate(request, id):
+    post = Filmas.objects.get(id=id)
+    form = AktoriusReviewForm(request.POST or None)
+    if form.is_valid():
+        author = request.POST.get('author')
+        stars = request.POST.get('stars')
+        comment = request.POST.get('comment')
+        review = Review(author=author, stars=stars, comment=comment, filmas=post)
+        review.save()
+        return redirect('success')
+
+    form = AktoriusReviewForm()
+    context = {
+        "form": form
+
+    }
+
+    return render(request, 'rate.html', context)

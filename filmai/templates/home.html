@@ -1,14 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
-<h1>Korean movies</h1>
-<p>&laquo;Sveiki atvykę į filmu rojų!&raquo;</p>
-<p>Šiuo metu yra:</p>
-<ul>
-    <li>Filmu: {{ num_filmai_t }}</li>
-    <li>Aktoriu: {{ num_aktoriai_t }}</li>
-</ul>
-<h4>Sveiki, {{ user.username }}</h4>
-<p>Jūs lankotės {{ num_visits_t }} kartą</p>
+
     <div class="container">
         {% for item in items %}
             <h1>{{ item.title}}</h1>

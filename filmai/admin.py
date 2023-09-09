@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Aktorius, Filmas, FilmasInstance, Review, Profilis, Category
+from .models import Aktorius, Filmas, FilmasInstance, Review, Profilis, Category, AReview
 # Register your models here.
 
 class FilmasInstanceInline(admin.TabularInline):
@@ -34,9 +34,14 @@ class AktoriusAdmin(admin.ModelAdmin):
 
 @admin.register(Review)
 class ReviewAdmin(admin.ModelAdmin):
-    list_display = ('review_date', 'author', 'comment')
+    list_display = ('review_date', 'movie', 'comment')
+
+@admin.register(AReview)
+class AReviewAdmin(admin.ModelAdmin):
+    list_display = ('review_date', 'aktorius', 'comment')
 
 
 
 admin.site.register(Profilis)
 admin.site.register(Category)
+

@@ -1,12 +1,33 @@
 {% extends "base.html" %}
-
+{% load static %}
 {% block content %}
 <h1>Aktoriai</h1>
 <p>Mūsų aktoriu sąrašas:</p>
+{% if aktorius_list %}
+<div class="row">
+    {% for aktorius_obj in aktorius_list %}
+    <div class="col-sm-6 col-md-3 d-flex align-items-stretch">
+        <div class="card mb-4 shadow-sm">
+            {% if aktorius_obj.photo %}
+            <img src="{{ aktorius_obj.photo.url }}" class="card-img-top">
+            {% else %}
+            <img src="{% static 'img/no-image.png' %}" class="card-img-top">
+            {% endif %}
+            <div class="card-body">
+                <h6 class="card-subtitle mb-2 text-muted">{{ aktorius_obj.aktoriusFK }}</h6>
+                <p class="card-text"><a href="{% url 'book-one' book_obj.id %}">{{ aktorius_obj.filmas }}</a></p>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+{% endif %}
 <ul>
     {% for aktorius_o in aktoriai_visos_eilutes_t %}
         <li><a href="{% url 'aktorius-vienas-url' aktorius_o.id %}">{{ aktorius_o.vardas_pavarde }}</a></li>
     {% endfor %}
+
 </ul>
 <div>
     {% if aktoriai_visos_eilutes_t.has_other_pages %}
@@ -25,5 +46,6 @@
     {% endif %}
     </ul>
 </div>
+
 
 {% endblock %}

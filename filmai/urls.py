@@ -13,4 +13,8 @@ urlpatterns = [
     path('success/', views.success, name='success-url'),
     path('rate/<int:id>', views.rate, name='rate-url'),
     path('paieska/', views.search, name='paieska-url'),
+    path('mybooks/new', views.FilmasByUserCreateView.as_view(), name='my-borrowed-new'),
+    path('mybooks/<uuid:pk>/update', views.FilmasByUserUpdateView.as_view(), name='my-borrowed-update'),
+    path('mybooks/<uuid:pk>/delete', views.FilmasByUserDeleteView.as_view(), name='my-borrowed-delete'),
+    path('mybooks/', views.LoanedFilmaiByUserListView.as_view(), name='my-borrowed'),
     ]

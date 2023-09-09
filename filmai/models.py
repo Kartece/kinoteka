@@ -15,14 +15,20 @@ import uuid
 class Category(models.Model):
     name = models.CharField("Kategorija", max_length=25)
 
+
     def __str__(self):
         return self.name
+
+    class Meta:
+        verbose_name = "Kategorija"
+        verbose_name_plural = "Kategorijos"
 
 
 class Aktorius(models.Model):
     vardas_pavarde = models.CharField('Vardas pavarde', max_length=100)
     g_metai = models.IntegerField('Gimimo data')
     kinografija = HTMLField()
+    nuotrauka = models.ImageField("Nuotrauka", upload_to="photo", null=True, blank=True)
 
 
     def __str__(self):
@@ -32,13 +38,20 @@ class Aktorius(models.Model):
         verbose_name = "Aktorius"
         verbose_name_plural = "Aktoriai"
 
+    def display_filmai(self):
+        return ', '.join(filmas.pavadinimas for filmas in self.filmas.all()[:3])
+
+    def get_absolute_url(self):
+        return reverse('aktorius-vienas', args=[str(self.id)])
+
 
 class Filmas(models.Model):
     pavadinimas = models.CharField('Pavadinimas', max_length=100)
-    rodymo_data = models.IntegerField('Kada pasirode')
-    aprasymas = models.TextField('Aprasymas', max_length=2000)
-    aktoriusFK = models.ForeignKey(Aktorius, on_delete=models.SET_NULL, null=True, related_name='filmas_set')
-    category = models.ManyToManyField(Category)
+    rating = models.FloatField(null=True, blank=True)
+    rodymo_data = models.IntegerField('Rodomas nuo:')
+    aprasymas = HTMLField()
+    aktoriusFK = models.ForeignKey(Aktorius, on_delete=models.SET_NULL, null=True, related_name='filmas_set', verbose_name="Aktorius")
+    category = models.ManyToManyField(Category, help_text="Išrinkite kategorija")
     cover = models.ImageField("Viršelis", upload_to="covers", null=True, blank=True)
 
     def __str__(self):
@@ -51,11 +64,10 @@ class Filmas(models.Model):
         verbose_name_plural = "Filmai"
 
 
-
 class FilmasInstance(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4)
     filmas = models.ForeignKey('Filmas', on_delete=models.CASCADE, related_name='filmasinstance_set')
-    due_back = models.DateField('Bus prieinama', null=True, blank=True)
+    due_back = models.DateField('Bus prieinamas', null=True, blank=True)
 
 
     LOAN_STATUS = (
@@ -75,13 +87,22 @@ class FilmasInstance(models.Model):
 
     reader = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
 
+    @property
+    def is_overdue(self):
+        if self.due_back and date.today() > self.due_back:
+            return True
+        else:
+            return False
+
+    class Meta:
+        ordering = ['due_back']
+
     def __str__(self):
         return f"{self.id}"
 
 
 class Review(models.Model):
-    author = models.CharField(max_length=40, default="anonymous")
-    review_date = models.DateTimeField(default=datetime.datetime)
+    review_date = models.DateTimeField(auto_now_add=True)
     rate_choices = (
         (1, 1),
         (2, 2),
@@ -90,11 +111,26 @@ class Review(models.Model):
         (5, 5),
     )
     stars = models.IntegerField(choices=rate_choices)
-    comment = models.TextField(max_length=4000)
-    movie = models.ForeignKey(Filmas, on_delete=models.CASCADE)
+    comment = models.TextField('Atsiliepimas', max_length=2000)
+    movie = models.ForeignKey(Filmas, on_delete=models.CASCADE, related_name='filmasreview_set', blank=True)
+    reviewer = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
 
     def __str__(self):
-        return self.movie.pavadinimas
+        return f'{self.movie.pavadinimas} - {self.author}'
+
+class AReview(models.Model):
+    review_date = models.DateTimeField(auto_now_add=True)
+    rate_choices = (
+        (1, 1),
+        (2, 2),
+        (3, 3),
+        (4, 4),
+        (5, 5),
+    )
+    stars = models.IntegerField(choices=rate_choices)
+    comment = models.TextField('Atsiliepimas', max_length=2000)
+    aktorius = models.ForeignKey(Filmas, on_delete=models.CASCADE, related_name='aktoriusreview_set', blank=True)
+    reviewer = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
 
 class Profilis(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, blank=True)
@@ -102,6 +138,10 @@ class Profilis(models.Model):
 
     def __str__(self):
         return f"{self.user.username} profilis"
+
+    class Meta:
+        verbose_name = "Profilis"
+        verbose_name_plural = "Profiliai"
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)

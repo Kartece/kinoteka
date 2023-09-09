@@ -5,15 +5,15 @@
     <form method="POST">
         {% csrf_token %}
         <fieldset class="form-group">
-            <legend class="border-bottom mb-4">Ištrinti knygą</legend>
-            <h2>Ar tikrai norite ištrinti filam is saraso?</h2>
-            <p>{{ object.id }} {{ object.filmas }} {{ object.filmas.aktorius }}</p>
+            <legend class="border-bottom mb-4">Istrinti filma</legend>
+            <h2>Ar tikrai norite ištrinti filma is saraso?</h2>
+            <p>{{ object.id }} {{ object.filmas }} {{ object.filmas.aktoriusFK }}</p>
             <p>{{ object.get_status_display }}</p>
         </fieldset>
         <div class="form-group">
-            <button class="btn btn-outline-danger" type="submit">Taip, ištrinti
+            <button class="btn btn-outline-danger" type="submit">Taip, istrinti
             </button>
-            <a class="btn btn-outline-secondary" href="{% url 'my-borrowed' %}">Atšaukti</a>
+            <a class="btn btn-outline-secondary" href="{% url 'my-borrowed' %}">Atsaukti</a>
         </div>
     </form>
 </div>
